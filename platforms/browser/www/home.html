@@ -10,7 +10,8 @@
   <script src="https://www.gstatic.com/firebasejs/5.5.0/firebase.js"></script>
   <script src="https://www.gstatic.com/firebasejs/5.3.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/5.4.1/firebase-firestore.js"></script>
-  <script src="cordova.js"></script>
+  <link href="https://fonts.googleapis.com/css?family=Spicy+Rice" rel="stylesheet">
+
   <script>
     // Initialize Firebase
     var config = {
@@ -24,7 +25,6 @@
     firebase.initializeApp(config);
     // Initialize Cloud Firestore through Firebase
     var db = firebase.firestore();
-
     // Disable deprecated features
     db.settings({
       timestampsInSnapshots: true
@@ -35,41 +35,63 @@
       padding-left: 5px;
       padding-bottom: 5px;
       padding-right: 5px;
-      color: orange;
+      color: 111111;
+
+    }
+
+    * {
+      font-family: 'Spicy Rice', cursive;
     }
   </style>
 </head>
 
 
 <body>
-  <ons-page>
-    <ons-toolbar>
-      <div class="left">
-        <ons-icon class="toolbaricon" size="30px" icon="fa-shopping-bag">
-        </ons-icon>
-      </div>
-      <div class="center" id="appname">#</div>
-      <div class="right">
-        <ons-icon class="toolbaricon" size="30px" icon="md-help" onclick= "window.location.href='logout.html'">
-        </ons-icon>
-      </div>
-    </ons-toolbar>
+  <ons-navigator swipeable id="myNavigator" page="tab3.html">
+    <ons-page>
+      <ons-toolbar style="background:#DDDDDD;">
+        <div class="left">
+          <ons-icon class="toolbaricon" size="30px" icon="fa-camera" onclick="window.location.href='scan.html'">
+          </ons-icon>
+        </div>
+        <div class="center" id="appname">#</div>
+        <div class="right">
+          <ons-icon class="toolbaricon" size="30px" icon="fa-sign-out" onclick="window.location.href='logout.html'">
+          </ons-icon>
+        </div>
+      </ons-toolbar>
 
-    <ons-tabbar swipeable position="auto">
-      <ons-tab page="tab1.html" label="Home" icon="ion-home, material:md-home" badge="7" active>
-      </ons-tab>
-      <ons-tab page="tab2.html" label="Cart" icon="fa-shopping-cart" active-icon="fa-shopping-cart">
-      </ons-tab>
-      <ons-tab page="tab3.html" label="All" icon="fa-shopping-cart" active-icon="fa-shopping-cart">
-      </ons-tab>
+      <ons-tabbar id="tabbar" swipeable position="auto" id='tabbar'>
+        <ons-tab page="tab1.html" label="Home" icon="ion-home, material:md-home" active style="background:#DDDDDD;">
+        </ons-tab>
+        <ons-tab page="tab2.html" label="Cart" icon="fa-shopping-cart" badge="" active-icon="fa-shopping-cart" style="background:#DDDDDD;">
+        </ons-tab>
+        <ons-tab page="tab3.html" label="product" icon="fa-shopping-cart" active-icon="fa-shopping-cart" style="background:#DDDDDD;">
+        </ons-tab>
 
-    </ons-tabbar>
-  </ons-page>
+      </ons-tabbar>
+    </ons-page>
 
+  </ons-navigator>
+  
+  <ons-modal direction="up">
+    <div style="text-align: center">
+      <p>
+        <ons-icon icon="md-spinner" size="28px" spin></ons-icon> Add To cart...
+      </p>
+    </div>
+  </ons-modal>
+  <ons-modal id="Delete" direction="up">
+    <div style="text-align: center">
+      <p>
+        <ons-icon icon="md-spinner" size="28px" spin></ons-icon> Delete...
+      </p>
+    </div>
+  </ons-modal>
   <template id="tab1.html">
     <ons-page id="Tab1">
       <p style="text-align: center; margin-top: 10px;">
-        <ons-search-input id ="search" placeholder="Search" onchange="scanQR()"></ons-search-input>
+        <ons-search-input placeholder="Search" onchange="search(this.value)"></ons-search-input>
       </p>
       <ons-carousel swipeable auto-scroll overscrollable id="carousel" style="height: 300px;">
         <ons-carousel-item id="carousel1" style="background: url('images/1.jpg') no-repeat center; background-size: contain;">
@@ -83,18 +105,19 @@
       <div id="icons"></div>
 
       <script id="icon_template" type="text/template">
-        <ons-row style="height:120px" vertical-align="center">  
-        <% categories.forEach(function(category){%>  
-        <ons-col style="background:#66ff99;" width="33%">
-          <p style="text-align: center; margin: 10px;">
-            <ons-icon size="60px" icon="<%= category.icon %>"></ons-icon>
-          </p>
-          <p style="text-align: center; margin: 10px;" id="icon1_text">
-            <%= category.name %>
-          </p>
-        </ons-col>
-        <%});%>
-        </ons-row>
+        <ons-row class="category" style="text-align:center">      
+          <% categories.forEach(function(category){%>
+      <ons-col style="background:#DDDDDD;" modifier="nodivider" id="  " onclick="changeTab('<%= category.name %>')"width="33%"value="<%= category.name %>">
+          <div >
+              <!-- <figure class="category_thumbnail"> -->
+                  <ons-icon id="icon1"size="60px" icon="<%= category.icon %>"></ons-icon>
+                  <div class="category_title" id="Category_1_name"> <%= category.name %> </div>
+              <!-- </figure> -->
+          </div>
+      </ons-col>
+
+      <%});%></div>
+        
         </script>
 
 
@@ -103,72 +126,115 @@
 
   <template id="tab2.html">
     <ons-page id="Tab2">
-      <ons-list>
-        <ons-list-header>Shopping Cart</ons-list-header>
-        <ons-list-item>
-          <div class="left">
-            <img class="list-item__thumbnail" src="images/item1.jpg">
-          </div>
-          <div class="center">
-            <span class="list-item__title">Apple Watch Series 3 GPS 42mm Grey</span>
-            <span class="list-item__subtitle" style="color: blue">฿12,650.00</span>
-          </div>
-          <div class="right">
-            <p style="text-align: center; margin: 10px;">
-              <ons-icon style="color: grey" size="30px" icon="md-delete"></ons-icon>
-            </p>
-          </div>
-        </ons-list-item>
-        <ons-list-item>
-          <div class="left">
-            <img class="list-item__thumbnail" src="images/item2.jpg">
-          </div>
-          <div class="center">
-            <span class="list-item__title">MICROLAB SPEAKER 2.1</span>
-            <span class="list-item__subtitle" style="color: blue">฿1,570.00</span>
-          </div>
-          <div class="right">
-            <p style="text-align: center; margin: 10px;">
-              <ons-icon style="color: grey" size="30px" icon="md-delete"></ons-icon>
-            </p>
-          </div>
-        </ons-list-item>
-        <ons-list-item>
-          <div class="left">
-            <img class="list-item__thumbnail" src="images/item3.jpg">
-          </div>
-          <div class="center">
-            <span class="list-item__title">Nike Air Max 90 ดำเทาแดง เบอร์ 40</span>
-            <span class="list-item__subtitle" style="color: blue">฿2,990.00</span>
-          </div>
-          <div class="right">
-            <p style="text-align: center; margin: 10px;">
-              <ons-icon style="color: grey" size="30px" icon="md-delete"></ons-icon>
-            </p>
-          </div>
-        </ons-list-item>
-      </ons-list>
-      <p style="text-align: center; margin: 10px;">
-        <ons-button modifier="large">PROCEED TO PAY</ons-button>
-      </p>
+      <ons-list-header>
+        <center>
+          <h1>
+            <b>SHOPPING CART</b>
+          </h1>
+        </center>
+      </ons-list-header>
+
+      <div id="pro"></div>
+      <div id="showprice"></div>
+      <script id="pro_template" type="text/template"> 
+                    <% cart.forEach(function(cart){
+                      var cart=cart.data()
+                      %>
+            <ons-list-item>
+                <div class="left" style="background:#DDDDDD;">
+                    <img class="list-item__thumbnail" src="<%= cart.photo %>">
+                </div>
+                <div class="center">
+                    <span class="list-item__title"><%= cart.itemname %></span>
+                    <span class="list-item__subtitle" style="color: blue;">฿<%= cart.price %></span>
+                </div>
+                <div class="right">
+                  <ons-icon   icon="md-delete" onclick="deleteb(<%=num%>); deleteprice('<%= cart.price %>')"></ons-icon>
+                </div>
+                 
+                    
+                    
+            </ons-list-item><%});%> 
+
+        </Script>
+      </div>
+
+
+      <ons-button modifier="large">PROCEED TO PAY</ons-button>
+
     </ons-page>
   </template>
 
   <template id="tab3.html">
-    <ons-page id="Tab3">
-      <p style="text-align: center; margin-top: 10px;">
+    <ons-page>
 
+      <div id="product"></div>
+      <script id="product_template" type="text/template"> 
+   <ons-row>
+          <% product.forEach(function(product){
+            var products = product.data();
+            %>
+  <ons-col width="49.99%" >
+    <ons-card  style="background:#DDDDDD;" style ="width=100% height=100px;"  onclick ="detail('<%- products.pid %>')" >
+          <img class="" src="<%= products.photo %>" width="100%" height="100px;"><br>
+  <%= products.Category %><br>
+  <%= products.title %><br>
+  ฿<%= products.price %>
+    </ons-card></ons-col>
+  
+  <%});%> 
+   </ons-row>
+   
+  
+  </Script>
+      </div>
 
-        <ons-button modifier="large" onclick="addNewdata();">
-          Add new data
     </ons-page>
-    </p>
+  </template>
+
+  <template id="tab4.html">
+    <ons-page>
+      <ons-toolbar>
+        <div class="left">
+          <ons-back-button>Page 1</ons-back-button>
+        </div>
+        <div class="center"></div>
+      </ons-toolbar>
+      <div id="detail"></div>
+      <script id="detail_template" type="text/template"> 
+            <ons-card style="background:#DDDDDD;">
+             
+             <% detail.forEach(function(data){   
+              var data = data.data(); %>
+            
+                  <img src=" <%= data.photo%>" alt=""height="300px"width="100%">
+                 
+  
+              <div class="title">
+                <%= data.title%>
+              </div>
+  
+              <div class="content">
+                <div>
+                 <h1>฿<%= data.price %></h1>
+                </div>
+  
+              </div>
+              <ons-button onclick="addtocart('<%= data.pid %>'); totalprice('<%= data.price %>')" >ADD TO CART</ons-button>
+              <%})%>
+            </ons-card>
+         
+        
+        </Script>
     </ons-page>
   </template>
 
 </body>
+
+
 <script>
   getHomeData();
+  tatol();
   document.addEventListener('prechange', function (event) {
     if (event.index == 0) {
       console.log('Home clicked');
@@ -177,98 +243,277 @@
     } else if (event.index == 1) {
       console.log('Cart clicked');
       // get data for cart screen  
-      getCartData();
+      getData2cart();
     }
-
-  });
-  function getHomeData() {
-    var code = localStorage.getItem('code');
-    if (code) {
-      $('#search').val(code);
-
-    }
-
-
-    var docRef = db.collection("UI").doc("home");
-    docRef.get().then(function (doc) {
-      if (doc.exists) {
-        console.log("Document data:", doc.data());
-        var data = doc.data();
-        $('#appname').html(data.appname);
-        var style = "background: url('images/" + data.slides[0] + "') no-repeat center; background-size: contain;'";
-        $('#carousel1').attr('style', style)
-        var icon_template = $('#icon_template').html();
-        var html = ejs.render(icon_template, { categories: data.categories });
-        $('#icons').html(html);
-      } else {
-        // doc.data() will be undefined in this case
-        console.log("No such document!");
+    else if (event.index == 2) {
+      console.log('Cart click');
+      var name = localStorage.getItem('name');
+      var items = localStorage.getItem('items');
+      if (name == null && items == null) {
+        getAllproduct()
       }
-    }).catch(function (error) {
-      console.log("Error getting document:", error);
-    });
+      else if (name != null && items == null) { getAllproduct(name) }
 
+      else if (name != null && items == null) { }
 
+      // get data for cart screen  
+    } else if (event.index == 3) {
+      var title = localStorage.getItem('title');
+      console.log('Cart click');
+      // test(title)
 
-    // $.getJSON('home.json', function (data) {
-    //  console.log(data);
-    //  $('#appname').html(data.appname);
-    // var style = "background: url('images/" + data.slides[0] + "') no-repeat center; background-size: contain;'";
-    //  $('#carousel1').attr('style', style)
-    // var icon_template = $('#icon_template').html();
-    //  var html = ejs.render(icon_template, { categories: data.categories });
-    //  $('#icons').html(html);
-    // });
+    } localStorage.clear();
+  });
+  //gethome
+  function getHomeData() {
+    var code = localStorage.getItem("code");
+ 
+    
+    if (code == null) {
+
+      var docRef = db.collection("UI").doc("home");
+      docRef.get().then(function (doc) {
+        if (doc.exists) {
+          console.log("Document data:", doc.data());
+          var data = doc.data();
+          $('#appname').html(data.appname);
+          var style = "background: url('images/" + data.slides[0] + "') no-repeat center; background-size: contain;'";
+          $('#carousel1').attr('style', style)
+          var icon_template = $('#icon_template').html();
+          var html = ejs.render(icon_template, { categories: data.categories });
+          $('#icons').html(html);
+        } else {
+          // doc.data() will be undefined in this case
+          console.log("No such document!");
+        }
+      }).catch(function (error) {
+        console.log("Error getting document:", error);
+      });
+    } else {
+      myNavigator.pushPage('tab4.html')
+      showdetail()
+
+    }
   }
+
+  //getcartdata
   function getCartData() {
     var docRef = db.collection("UI").doc("cart");
     docRef.get().then(function (doc) {
       if (doc.exists) {
         console.log("Document data:", doc.data());
         var data = doc.data();
-
+        // $('#photo').html(data.cart[0].photo);
+        // $('#price').html(data.cart[0].price); 
+        var pro_template = $('#pro_template').html();
+        var html = ejs.render(pro_template, { cart: data.cart });
+        $('#pro').html(html);
       } else {
-        // doc.data() will be undefined in this case
         console.log("No such document!");
       }
     }).catch(function (error) {
       console.log("Error getting document:", error);
     });
-
-
-    // $.getJSON('cart.json', function (data) {
-    // console.log(data);
-    //});
   }
-  function getAllproduct() {
-    var allproduct = db.collection("product").where("category", "sport");
-    allproduct.get().then(function (querySnapshot) {
-      querySnapshot.forEach(function (doc) {
-        // doc.data() is never undefined for query doc snapshots
-        console.log(doc.id, " => ", doc.data());
-      });
-    });
-  }
+  //addNewdata
   function addNewdata() {
-    var data = {
-      pid: '4',
-      title: 'iPoneXS',
-      category: 'electronic'
-    }
     db.collection("product").add(data)
-
       .then(function (docRef) {
         console.log("Document written with ID: ", docRef.id);
       })
       .catch(function (error) {
         console.error("Error adding document: ", error);
       });
+    //getAllproduct
+    function getAllProduct(name) {
+      console.log(name);
+      if (name == null) {
+        db.collection("product").get()
+          .then(function (querySnapshot) {
+            // doc.data() is never undefined for query doc snapshots
+            var product_template = $('#product_template').html();
+            console.log(querySnapshot.docs);
+            var html = ejs.render(product_template, { product: querySnapshot.docs });
+            $('#product').html(html);
+          })
+          .catch(function (error) {
+            console.log("Error getting documents: ", error);
+          });
+      } else {
+        db.collection("product").where("category", "==", name).get()
+          .then(function (querySnapshot) {
+            console.log(querySnapshot.docs);
+            if (querySnapshot.docs.length == 0) {
+              var html = ""
+              db.collection("product").get()
+                .then(function (querySnapshot) {
+                  // doc.data() is never undefined for query doc snapshots
+                  var product_template = $('#product_template').html();
+                  console.log(querySnapshot.docs);
+                  html += ejs.render(product_template, { product: querySnapshot.docs });
+                  $('#product').html(html);
+                })
+                .catch(function (error) {
+                  console.log("Error getting documents: ", error);
+                });
+            } else {
+              db.collection("product").where("category", "==", name).get()
+                .then(function (querySnapshot) {
+                  // doc.data() is never undefined for query doc snapshots
+                  console.log(querySnapshot.docs);
+                  var product_template = $('#product_template').html();
+                  var html = ejs.render(product_template, { product: querySnapshot.docs });
+                  $('#product').html(html);
+                })
+                .catch(function (error) {
+                  console.log("Error getting documents: ", error);
+                });
+            }
+          })
+      }
+    }
+  }
+  function getAllproduct(name1) {
+    if (name1 == null) {
+      var allproduct = db.collection("product");
+      allproduct.get().then(function (querySnapshot) {
+        var product_template = $('#product_template').html();
+        var html = ejs.render(product_template, { product: querySnapshot.docs });
+        $('#product').html(html);
+      });
+    } else {
+      var allproduct = db.collection("product").where('category', '==', name1);
+      allproduct.get().then(function (querySnapshot) {
+        var product_template = $('#product_template').html();
+        var html = ejs.render(product_template, { product: querySnapshot.docs });
+        $('#product').html(html);
+      });
+    }
+  }
+
+  //change
+
+
+  function changeTab(name) {
+    console.log(name)
+    document.getElementById('tabbar').setActiveTab(2);
+    localStorage.setItem('name', name);
 
   }
-  function scanQR() {
-    window.location.href = 'scan.html'
+  //detail
+  function detail(pid) {
+    localStorage.setItem('id', pid);
+    myNavigator.pushPage('tab4.html')
+    showdetail()
+
+  }
+  //showdata
+  function showdetail() {
+    var code = localStorage.getItem("code");
+    if (code == null) {
+      var id = localStorage.getItem('id');
+    } else if (code != null) {
+      var id = localStorage.getItem("code");
+      
+     }
+    
+    db.collection("product").where("pid", "==", id).get()
+      .then(function (querySnapshot) {
+        // doc.data() is never undefined for query doc snapshots
+        console.log(querySnapshot.docs);
+        var detail_template = $('#detail_template').html();
+        var html = ejs.render(detail_template, { detail: querySnapshot.docs });
+        $('#detail').html(html);
+      })
+       localStorage.clear("code");
+   
+  }
+  //search
+  function search(search) {
+    const filterItems = (needle, heystack) => {
+      let query = needle.toLowerCase();
+      return heystack.filter(item => item.data().title.toLowerCase().indexOf(needle) >= 0);
+    }
+    var item = filterItems(search, data);
+    localStorage.setItem('items', item);
+    test(item);
+    document.getElementById('tabbar').setActiveTab(2);
+  }
+  const data = []
+  function tatol() {
+    console.log(search);
+    db.collection("product").get()
+      .then(function (querySnapshot) {
+        querySnapshot.docs.forEach(function (item) {
+          data.push(item)
+          console.log(data)
+        });
+      })
+  }
+  //test
+  function test(title) {
+    var product_template = $('#product_template').html();
+    var html = ejs.render(product_template, { product: title });
+    $('#product').html(html);
+  }
+  var dataCart = [];
+  function addtocart(add2cart) {
+    localStorage.clear('quentinTarantino');
+    localStorage.setItem('quentinTarantino', add2cart);
+    var retrievedData = localStorage.getItem("quentinTarantino");
+    console.log(retrievedData);
+    dataCart.push(retrievedData);
+    var modal = document.querySelector('ons-modal');
+    modal.show();
+    setTimeout(function () {
+      modal.hide();
+    }, 2000);
+  }
+  //????????? array ??????????????? firebase ?????????????????? template
+  //gteDate2cart
+  function getData2cart() {
+    document.getElementById('pro').innerHTML = ""
+    console.log('zeze', dataCart);
+    var testnum = 0;
+    dataCart.forEach(function (dataCart) {
+      var apr = db.collection("product").where("pid", "==", dataCart);
+      apr.get().then(function (querySnapshot) {
+        console.log(querySnapshot.docs)
+        var pro_template = $('#pro_template').html();
+        var html = ejs.render(pro_template, { cart: querySnapshot.docs, num: testnum });
+        console.log(html);
+        $('#pro').append(html);
+        testnum = testnum + 1;
+      })
+    })
+  }
+  //Delete 
+  function deleteb(i) {
+    console.log(i);
+    console.log(dataCart);
+    var remove = dataCart.splice(i, 1)
+    var modal = document.querySelector('#Delete');
+    modal.show();
+    setTimeout(function () {
+      modal.hide();
+    }, 2000);
 
 
+    getData2cart()
+  }
+  var priceitem = 0;
+  //Total 
+  function totalprice(price1) {
+    var price1 = parseInt(price1, 10)
+    console.log(price1);
+    priceitem = priceitem + price1;
+    $('#showprice').html("<p><b>&nbsp; Total Price is :฿ </b>" + priceitem + " </p>");
+  }
+  function deleteprice(price2) {
+    var price2 = parseInt(price2, 10)
+    console.log(price2);
+    priceitem = priceitem - price2;
+    $('#showprice').html("<p><b>&nbsp; Total Price is : </b>" + priceitem + " </p>");
   }
 </script>
 

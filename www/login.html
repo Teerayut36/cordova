@@ -34,7 +34,7 @@
             padding-left: 5px;
             padding-bottom: 5px;
             padding-right: 5px;
-            color: orange;
+            color: 111111;
         }
     </style>
 </head>
@@ -50,10 +50,13 @@
                 <ons-input id="password" modifier="underbar" type="password" placeholder="Password" float></ons-input>
             </p>
             <p style="margin-top: 30px;">
-                <ons-button onclick="login()">Sign in</ons-button>
+                <ons-button onclick="login()" style="background:#9370DB;">Sign in</ons-button>
             </p>
             <p style="margin-top: 30px;">
-                <ons-button onclick="google()">Sign in google</ons-button>
+                <ons-button onclick="google()" style="background:#FF3366;">Sign in google</ons-button>
+            </p>
+            <p style="margin-top: 30px;">
+                <ons-button onclick="facebook()" style="background:#0033FF;">Sign in facebook</ons-button>
             </p>
             <p>
                 <a href="register.html">sign uo for a new user</a>
@@ -108,7 +111,29 @@
             });
 
         }
-
+        function facebook() {
+            var provider = new firebase.auth.FacebookAuthProvider();
+           
+            firebase.auth().signInWithRedirect(provider);
+            firebase.auth().getRedirectResult().then(function (result) {
+                if (result.credential) {
+                    // This gives you a Facebook Access Token. You can use it to access the Facebook API.
+                    var token = result.credential.accessToken;
+                    // ...
+                }
+                // The signed-in user info.
+                var user = result.user;
+            }).catch(function (error) {
+                // Handle Errors here.
+                var errorCode = error.code;
+                var errorMessage = error.message;
+                // The email of the user's account used.
+                var email = error.email;
+                // The firebase.auth.AuthCredential type that was used.
+                var credential = error.credential;
+                // ...
+            });
+        }
     </script>
 
 </body>
